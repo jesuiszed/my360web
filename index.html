@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base href="/">
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="description" content="My 360 VOD - Plateforme de streaming immersive">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="My 360 VOD">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+
+  <link rel="icon" type="image/png" href="favicon.png"/>
+
+  <title>My 360 VOD</title>
+  <link rel="manifest" href="manifest.json">
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #1a1a1a 0%, #2c003e 100%);
+      color: #ffffff;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      overflow: hidden;
+    }
+
+    .loading {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(5px);
+    }
+
+    .loading-spinner {
+      width: 60px;
+      height: 60px;
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .loading-spinner::before,
+    .loading-spinner::after {
+      content: '';
+      position: absolute;
+      border-radius: 50%;
+      border: 4px solid transparent;
+      border-top-color: #ff007a;
+      border-bottom-color: #00d4ff;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    .loading-spinner::before {
+      width: 60px;
+      height: 60px;
+    }
+
+    .loading-spinner::after {
+      width: 40px;
+      height: 40px;
+      animation-delay: 0.3s;
+    }
+
+    @keyframes pulse {
+      0% {
+        transform: scale(0.8);
+        opacity: 0.7;
+      }
+      50% {
+        transform: scale(1.2);
+        opacity: 1;
+      }
+      100% {
+        transform: scale(0.8);
+        opacity: 0.7;
+      }
+    }
+
+    .loading-text {
+      margin-top: 20px;
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      opacity: 0;
+      animation: fadeIn 1.5s ease-in-out forwards;
+      animation-delay: 0.5s;
+    }
+
+    @keyframes fadeIn {
+      0% { opacity: 0; transform: translateY(10px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Import Inter font from Google Fonts */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+  </style>
+</head>
+<body>
+  <div class="loading" id="loading">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">Chargement de votre expérience immersive...</div>
+  </div>
+
+<script>
+  var scriptLoaded = false;
+
+  function loadMainDartJs() {
+    if (scriptLoaded) return;
+    scriptLoaded = true;
+
+    const scriptTag = document.createElement('script');
+    scriptTag.src = 'main.dart.js';
+    scriptTag.type = 'application/javascript';
+    scriptTag.onload = () => {
+      setTimeout(() => {
+        const loadingElement = document.getElementById('loading');
+        if (loadingElement) loadingElement.style.display = 'none';
+      }, 1000);
+    };
+    document.body.append(scriptTag);
+  }
+
+  async function initApp() {
+    let serviceWorkerVersion = null;
+
+    try {
+      const res = await fetch('version.json');
+      const json = await res.json();
+      serviceWorkerVersion = json.version;
+    } catch (e) {
+      console.warn('Could not fetch service worker version:', e);
+    }
+
+    if ('serviceWorker' in navigator && serviceWorkerVersion) {
+      const serviceWorkerUrl = 'flutter_service_worker.js?v=' + serviceWorkerVersion;
+      navigator.serviceWorker.register(serviceWorkerUrl)
+        .then((reg) => {
+          function waitForActivation(sw) {
+            sw.addEventListener('statechange', () => {
+              if (sw.state === 'activated') {
+                console.log('Service worker activated.');
+                loadMainDartJs();
+              }
+            });
+          }
+
+          if (!reg.active && (reg.installing || reg.waiting)) {
+            waitForActivation(reg.installing || reg.waiting);
+          } else if (!reg.active || !reg.active.scriptURL.endsWith(serviceWorkerVersion)) {
+            console.log('New service worker available.');
+            reg.update();
+            if (reg.installing) {
+              waitForActivation(reg.installing);
+            } else {
+              loadMainDartJs();
+            }
+          } else {
+            console.log('Using existing service worker.');
+            loadMainDartJs();
+          }
+        })
+        .catch((e) => {
+          console.warn('Service worker registration failed:', e);
+          loadMainDartJs();
+        });
+
+      setTimeout(() => {
+        if (!scriptLoaded) {
+          console.warn('Fallback after timeout.');
+          loadMainDartJs();
+        }
+      }, 4000);
+    } else {
+      loadMainDartJs();
+    }
+  }
+
+  window.addEventListener('load', initApp);
+</script>
+</body>
+</html>
