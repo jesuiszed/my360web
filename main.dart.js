@@ -116677,7 +116677,7 @@ var $async$AF=A.r(function(d,a0){if(d===1){o.push(a0)
 s=p}while(true)switch(s){case 0:f=A.bi(c,!1,t.d)
 if(!f.f&&f.c==null)throw A.c(A.aY("Utilisateur non authentifi\xe9."))
 p=4
-j=A.cn("https://late-tires-clean.loca.lt/api/enhance-description/")
+j=A.cn("https://spotty-queens-hammer.loca.lt/api/enhance-description/")
 s=7
 return A.q(f.oA(),$async$AF)
 case 7:i=a0
@@ -116713,7 +116713,7 @@ var $async$Ag=A.r(function(a0,a1){if(a0===1){o.push(a1)
 s=p}while(true)switch(s){case 0:e=A.bi(c,!1,t.d)
 if(!e.f||e.c==null)throw A.c(A.aY("Utilisateur non authentifi\xe9."))
 p=4
-i=A.cn("https://late-tires-clean.loca.lt/api/generate-tags/")
+i=A.cn("https://spotty-queens-hammer.loca.lt/api/generate-tags/")
 s=7
 return A.q(e.oA(),$async$Ag)
 case 7:h=a1
@@ -122769,7 +122769,7 @@ k=A.a_(new A.hA(new A.b1(o,new A.amQ(),m.h("b1<1>")),new A.amR(),l),l.h("y.E"))
 o=c.c
 m=A.a4(o).h("a2<1,av<i,Q?>>")
 j=A.a_(new A.a2(o,new A.amS(),m),m.h("ao.E"))
-o=A.cn("https://late-tires-clean.loca.lt/api/chatbot/")
+o=A.cn("https://spotty-queens-hammer.loca.lt/api/chatbot/")
 m=t.N
 l=A.S(["Content-Type","application/json","Authorization","Bearer "+A.j(a.c)],m,m)
 s=3
